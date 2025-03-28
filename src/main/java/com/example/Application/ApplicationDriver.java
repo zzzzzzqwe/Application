@@ -5,9 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import org.controlsfx.control.textfield.TextFields;
-
-import java.util.List;
+import java.util.Objects;
 
 public class ApplicationDriver extends Application {
 
@@ -34,6 +32,9 @@ public class ApplicationDriver extends Application {
         VBox.setVgrow(outputArea, Priority.ALWAYS);
 
         Scene scene = new Scene(layout, 750, 500);
+
+        // css styles
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setTitle("Университетская информационная система");
         primaryStage.show();
@@ -96,9 +97,9 @@ public class ApplicationDriver extends Application {
         TextField teacherInput = new TextField();
         teacherInput.setPromptText("Введите имя или фамилию преподавателя");
 
-        // Автозаполнение
-        List<String> teacherNames = DatabaseService.getAllTeacherNames();
-        TextFields.bindAutoCompletion(teacherInput, teacherNames);
+        // Автозаполнение todo if possible, this is not working properly
+        // List<String> teacherNames = DatabaseService.getAllTeacherNames();
+        // TextFields.bindAutoCompletion(teacherInput, teacherNames);
 
         Button searchTeacherBtn = new Button("Найти преподавателя");
         searchTeacherBtn.setOnAction(e -> {

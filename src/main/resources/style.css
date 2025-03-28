@@ -1,0 +1,48 @@
+.root {
+    -fx-background-color: #f4f4f4;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.button {
+    -fx-background-color: linear-gradient(to bottom, #4a90e2, #357abd);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-padding: 8 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0.1, 0, 1);
+    -fx-transition: all 0.2s ease-in-out;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to bottom, #5aa0f0, #3f84d4);
+}
+
+.button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #2f5d9e, #274c84);
+    -fx-translate-y: 1;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.4), 6, 0.1, 0, 1);
+}
+
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 4;
+    -fx-padding: 6;
+    -fx-font-size: 13px;
+}
+
+.label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.tab-pane {
+    -fx-background-color: #eaeaea;
+}
+
+.text-area {
+    -fx-control-inner-background: #fdfdfd;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 4;
+}
