@@ -32,6 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-# Игнорируем файл подключения к базе данных
+# db con
 src/main/java/com/example/Application/DatabaseConnection.java
 
