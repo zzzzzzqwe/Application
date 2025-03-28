@@ -10,7 +10,6 @@ import java.util.List;
 public class DatabaseService {
 
 
-
     // ВЫВОД ВСЕХ АУДИТОРИЙ
     public static String getAllRoomsWithCurrentTeachers() {
         StringBuilder result = new StringBuilder();
@@ -21,7 +20,6 @@ public class DatabaseService {
                 "        FROM rooms r\n" +
                 "        LEFT JOIN teachers t ON r.room_number = t.room_number\n" +
                 "        ORDER BY r.room_number;";
-
 
 
         try (Connection con = DatabaseConnection.getConnection();
@@ -48,14 +46,14 @@ public class DatabaseService {
         StringBuilder result = new StringBuilder();
 
         String sql = """
-        SELECT 
-            r.room_number,
-            COALESCE(CONCAT(t.last_name, ' ', t.first_name), '-') AS teacher
-        FROM rooms r
-        LEFT JOIN teachers t ON r.room_number = t.room_number
-        WHERE r.room_number = ?
-        ORDER BY r.room_number;
-    """;
+                    SELECT 
+                        r.room_number,
+                        COALESCE(CONCAT(t.last_name, ' ', t.first_name), '-') AS teacher
+                    FROM rooms r
+                    LEFT JOIN teachers t ON r.room_number = t.room_number
+                    WHERE r.room_number = ?
+                    ORDER BY r.room_number;
+                """;
 
         try (Connection con = DatabaseConnection.getConnection();
              var ps = con.prepareStatement(sql)) {
@@ -85,13 +83,13 @@ public class DatabaseService {
         StringBuilder result = new StringBuilder();
 
         String sql = """
-        SELECT 
-            r.room_number,
-            CONCAT(t.last_name, ' ', t.first_name) AS teacher
-        FROM rooms r
-        JOIN teachers t ON r.room_number = t.room_number
-        ORDER BY r.room_number;
-    """;
+                    SELECT 
+                        r.room_number,
+                        CONCAT(t.last_name, ' ', t.first_name) AS teacher
+                    FROM rooms r
+                    JOIN teachers t ON r.room_number = t.room_number
+                    ORDER BY r.room_number;
+                """;
 
         try (Connection con = DatabaseConnection.getConnection();
              Statement st = con.createStatement();
@@ -116,15 +114,15 @@ public class DatabaseService {
         StringBuilder result = new StringBuilder();
 
         String sql = """
-        SELECT 
-            r.room_number,
-            'Свободно' AS status
-        FROM rooms r
-        WHERE r.room_number NOT IN (
-            SELECT room_number FROM teachers WHERE room_number IS NOT NULL
-        )
-        ORDER BY r.room_number;
-    """;
+                    SELECT 
+                        r.room_number,
+                        'Свободно' AS status
+                    FROM rooms r
+                    WHERE r.room_number NOT IN (
+                        SELECT room_number FROM teachers WHERE room_number IS NOT NULL
+                    )
+                    ORDER BY r.room_number;
+                """;
 
         try (Connection con = DatabaseConnection.getConnection();
              Statement st = con.createStatement();
@@ -148,14 +146,14 @@ public class DatabaseService {
         StringBuilder result = new StringBuilder();
 
         String sql = """
-        SELECT 
-            CONCAT(t.last_name, ' ', t.first_name) AS teacher,
-            t.email,
-            t.phone,
-            COALESCE(t.room_number, '-') AS room_number
-        FROM teachers t
-        ORDER BY t.last_name, t.first_name;
-    """;
+                    SELECT 
+                        CONCAT(t.last_name, ' ', t.first_name) AS teacher,
+                        t.email,
+                        t.phone,
+                        COALESCE(t.room_number, '-') AS room_number
+                    FROM teachers t
+                    ORDER BY t.last_name, t.first_name;
+                """;
 
         try (Connection con = DatabaseConnection.getConnection();
              Statement st = con.createStatement();
@@ -186,15 +184,15 @@ public class DatabaseService {
         StringBuilder result = new StringBuilder();
 
         String sql = """
-        SELECT 
-            CONCAT(t.last_name, ' ', t.first_name) AS teacher,
-            t.email,
-            t.phone,
-            COALESCE(t.room_number, '-') AS room_number
-        FROM teachers t
-        WHERE t.first_name ILIKE ? OR t.last_name ILIKE ?
-        ORDER BY t.last_name, t.first_name;
-    """;
+                    SELECT 
+                        CONCAT(t.last_name, ' ', t.first_name) AS teacher,
+                        t.email,
+                        t.phone,
+                        COALESCE(t.room_number, '-') AS room_number
+                    FROM teachers t
+                    WHERE t.first_name ILIKE ? OR t.last_name ILIKE ?
+                    ORDER BY t.last_name, t.first_name;
+                """;
 
         try (Connection con = DatabaseConnection.getConnection();
              var ps = con.prepareStatement(sql)) {
@@ -251,7 +249,7 @@ public class DatabaseService {
 
         return names;
     }
-
+}
 
 
 
