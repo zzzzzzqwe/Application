@@ -1,71 +1,122 @@
 package com.example.Application;
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.controlsfx.control.textfield.TextFields;
+
+import java.util.List;
 
 public class ApplicationDriver extends Application {
 
-    @Override
-    public void start(Stage primaryStage) {
-        TextField idField = new TextField();
-        idField.setPromptText("Введите ID преподавателя");
-        Button getEmailButton = new Button("Получить email");
-
-        TextArea resultArea = new TextArea();
-        resultArea.setEditable(false);
-
-        TextField searchField = new TextField();
-        searchField.setPromptText("Поиск преподавателя");
-        Button searchButton = new Button("Искать");
-
-        TextField roomField = new TextField();
-        roomField.setPromptText("Номер аудитории");
-        Button checkRoomButton = new Button("Проверить аудиторию");
-
-        VBox layout = new VBox(10, idField, getEmailButton, searchField, searchButton, roomField, checkRoomButton, resultArea);
-        layout.setPadding(new Insets(15));
-
-        getEmailButton.setOnAction(e -> {
-            try {
-                int id = Integer.parseInt(idField.getText());
-                String email = DatabaseService.getTeacherEmailById(id);
-                resultArea.setText("Email преподавателя: " + email);
-            } catch (Exception ex) {
-                resultArea.setText("Ошибка: " + ex.getMessage());
-            }
-        });
-
-        searchButton.setOnAction(e -> {
-            try {
-                String query = searchField.getText();
-                String result = DatabaseService.searchTeachers(query);
-                resultArea.setText(result);
-            } catch (Exception ex) {
-                resultArea.setText("Ошибка: " + ex.getMessage());
-            }
-        });
-
-        checkRoomButton.setOnAction(e -> {
-            try {
-                int room = Integer.parseInt(roomField.getText());
-                String result = DatabaseService.checkRoomStatus(room);
-                resultArea.setText(result);
-            } catch (Exception ex) {
-                resultArea.setText("Ошибка: " + ex.getMessage());
-            }
-        });
-
-        Scene scene = new Scene(layout, 400, 400);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Приложение преподавателей");
-        primaryStage.show();
-    }
+    private TextArea outputArea;
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        outputArea = new TextArea();
+        outputArea.setEditable(false);
+        outputArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
+
+        TabPane tabPane = new TabPane();
+        tabPane.getTabs().addAll(
+                createRoomsTab(),
+                createTeachersTab(),
+                createSearchTab()
+        );
+
+        VBox layout = new VBox(tabPane, outputArea);
+        VBox.setVgrow(outputArea, Priority.ALWAYS);
+
+        Scene scene = new Scene(layout, 750, 500);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Университетская информационная система");
+        primaryStage.show();
+    }
+
+    private Tab createRoomsTab() {
+        Tab tab = new Tab("Аудитории");
+
+        Button allRoomsBtn = new Button("Все");
+        Button busyRoomsBtn = new Button("Занятые");
+        Button freeRoomsBtn = new Button("Свободные");
+
+        allRoomsBtn.setOnAction(e -> outputArea.setText(DatabaseService.getAllRoomsWithCurrentTeachers()));
+        busyRoomsBtn.setOnAction(e -> outputArea.setText(DatabaseService.getOccupiedRooms()));
+        freeRoomsBtn.setOnAction(e -> outputArea.setText(DatabaseService.getFreeRooms()));
+
+        HBox buttons = new HBox(10, allRoomsBtn, busyRoomsBtn, freeRoomsBtn);
+        buttons.setPadding(new Insets(10));
+
+        VBox content = new VBox(buttons);
+        tab.setContent(content);
+        tab.setClosable(false);
+        return tab;
+    }
+
+
+    private Tab createTeachersTab() {
+        Tab tab = new Tab("Преподаватели");
+        TextField teacherInput = new TextField();
+        teacherInput.setPromptText("Введите имя или фамилию преподавателя");
+
+
+
+        Button allTeachersBtn = new Button("Показать всех");
+
+        allTeachersBtn.setOnAction(e -> outputArea.setText(DatabaseService.getAllTeachers()));
+
+        VBox content = new VBox(10, allTeachersBtn);
+        content.setPadding(new Insets(10));
+        tab.setContent(content);
+        tab.setClosable(false);
+        return tab;
+    }
+
+    private Tab createSearchTab() {
+        Tab tab = new Tab("Поиск");
+
+        // Поиск кабинета
+        TextField roomInput = new TextField();
+        roomInput.setPromptText("Введите номер аудитории");
+        Button searchRoomBtn = new Button("Найти аудиторию");
+        searchRoomBtn.setOnAction(e -> {
+            String input = roomInput.getText().trim();
+            if (!input.isEmpty()) {
+                outputArea.setText(DatabaseService.searchRoomByNumber(input));
+            }
+        });
+
+        // Поиск преподавателя
+        TextField teacherInput = new TextField();
+        teacherInput.setPromptText("Введите имя или фамилию преподавателя");
+
+        // Автозаполнение
+        List<String> teacherNames = DatabaseService.getAllTeacherNames();
+        TextFields.bindAutoCompletion(teacherInput, teacherNames);
+
+        Button searchTeacherBtn = new Button("Найти преподавателя");
+        searchTeacherBtn.setOnAction(e -> {
+            String input = teacherInput.getText().trim();
+            if (!input.isEmpty()) {
+                outputArea.setText(DatabaseService.searchTeachersByName(input));
+            }
+        });
+
+        VBox content = new VBox(10,
+                new Label("Поиск аудитории:"), roomInput, searchRoomBtn,
+                new Separator(),
+                new Label("Поиск преподавателя:"), teacherInput, searchTeacherBtn
+        );
+        content.setPadding(new Insets(10));
+
+        tab.setContent(content);
+        tab.setClosable(false);
+        return tab;
     }
 }
