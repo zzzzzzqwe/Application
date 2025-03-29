@@ -3,8 +3,12 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.controlsfx.control.textfield.TextFields;
+
+import java.util.List;
 import java.util.Objects;
 
 public class ApplicationDriver extends Application {
@@ -17,6 +21,9 @@ public class ApplicationDriver extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        primaryStage.getIcons().add(
+                new Image(getClass().getResourceAsStream("/icon.png"))
+        );
         outputArea = new TextArea();
         outputArea.setEditable(false);
         outputArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
@@ -97,7 +104,7 @@ public class ApplicationDriver extends Application {
         TextField teacherInput = new TextField();
         teacherInput.setPromptText("Введите имя или фамилию преподавателя");
 
-        // Автозаполнение todo if possible, this is not working properly
+        // Автозаполнение todo if possible, this is not working properly. Full names are not allowed
         // List<String> teacherNames = DatabaseService.getAllTeacherNames();
         // TextFields.bindAutoCompletion(teacherInput, teacherNames);
 
