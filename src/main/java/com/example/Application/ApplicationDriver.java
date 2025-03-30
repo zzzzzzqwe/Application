@@ -104,7 +104,7 @@ public class ApplicationDriver extends Application {
         TextField teacherInput = new TextField();
         teacherInput.setPromptText("Введите имя или фамилию преподавателя");
 
-        // Автозаполнение todo if possible, this is not working properly. Full names are not allowed
+        // Автозаполнение
         // List<String> teacherNames = DatabaseService.getAllTeacherNames();
         // TextFields.bindAutoCompletion(teacherInput, teacherNames);
 

@@ -190,7 +190,7 @@ public class DatabaseService {
                         t.phone,
                         COALESCE(t.room_number, '-') AS room_number
                     FROM teachers t
-                    WHERE t.first_name ILIKE ? OR t.last_name ILIKE ?
+                    WHERE t.first_name ILIKE ? OR t.last_name ILIKE ? OR CONCAT(t.last_name, ' ', t.first_name) ILIKE ?
                     ORDER BY t.last_name, t.first_name;
                 """;
 
@@ -200,6 +200,7 @@ public class DatabaseService {
             String likePattern = "%" + namePart + "%";
             ps.setString(1, likePattern);
             ps.setString(2, likePattern);
+            ps.setString(3, likePattern);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
