@@ -7,7 +7,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
-
 import java.util.List;
 import java.util.Objects;
 

@@ -45,6 +45,7 @@ public class DatabaseService {
     public static String searchRoomByNumber(String roomInput) {
         StringBuilder result = new StringBuilder();
 
+        // prepared statement with placeholders to avoid sql-injections
         String sql = """
                     SELECT 
                         r.room_number,
@@ -183,6 +184,7 @@ public class DatabaseService {
     public static String searchTeachersByName(String namePart) {
         StringBuilder result = new StringBuilder();
 
+        // prepared statement with placeholders to avoid sql-injections
         String sql = """
                     SELECT 
                         CONCAT(t.last_name, ' ', t.first_name) AS teacher,
