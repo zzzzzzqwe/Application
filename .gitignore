@@ -35,3 +35,6 @@ build/
 # db con
 src/main/java/com/example/Application/DatabaseConnection.java
 
+#properties
+src/main/resources/application.properties
+

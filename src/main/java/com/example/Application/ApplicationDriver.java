@@ -104,8 +104,8 @@ public class ApplicationDriver extends Application {
         teacherInput.setPromptText("Введите имя или фамилию преподавателя");
 
         // Автозаполнение
-        // List<String> teacherNames = DatabaseService.getAllTeacherNames();
-        // TextFields.bindAutoCompletion(teacherInput, teacherNames);
+        List<String> teacherNames = DatabaseService.getAllTeacherNames();
+        TextFields.bindAutoCompletion(teacherInput, teacherNames);
 
         Button searchTeacherBtn = new Button("Найти преподавателя");
         searchTeacherBtn.setOnAction(e -> {
