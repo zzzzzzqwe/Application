@@ -1,7 +1,6 @@
-package com.example.Application.service;
+package com.coursework.Application.service;
 
-import com.example.Application.DatabaseConnection;
-
+import com.coursework.Application.database.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
