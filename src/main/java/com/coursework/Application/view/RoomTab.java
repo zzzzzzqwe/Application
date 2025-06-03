@@ -1,31 +1,141 @@
 package com.coursework.Application.view;
 
 import com.coursework.Application.service.RoomService;
+import com.coursework.Application.util.UserSession;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.Separator;
 
 public class RoomTab {
+
     public static Tab createRoomsTab(TextArea outputArea) {
         Tab tab = new Tab("Аудитории");
+        tab.getStyleClass().add("tab-label");
 
-        Button allRoomsBtn = new Button("Все");
+        VBox container = new VBox(15);
+        container.getStyleClass().add("tab-content-area");
+        container.setPadding(new Insets(15));
+
+        HBox buttonsBox = new HBox(10);
+        Button allRoomsBtn  = new Button("Все кабинеты");
         Button busyRoomsBtn = new Button("Занятые");
         Button freeRoomsBtn = new Button("Свободные");
+        allRoomsBtn.getStyleClass().add("action-button");
+        busyRoomsBtn.getStyleClass().add("action-button");
+        freeRoomsBtn.getStyleClass().add("action-button");
+        buttonsBox.getChildren().addAll(allRoomsBtn, busyRoomsBtn, freeRoomsBtn);
 
-        allRoomsBtn.setOnAction(e -> outputArea.setText(RoomService.getAllRoomsWithCurrentTeachers()));
-        busyRoomsBtn.setOnAction(e -> outputArea.setText(RoomService.getOccupiedRooms()));
-        freeRoomsBtn.setOnAction(e -> outputArea.setText(RoomService.getFreeRooms()));
+        Separator separator = new Separator();
 
-        HBox buttons = new HBox(10, allRoomsBtn, busyRoomsBtn, freeRoomsBtn);
-        buttons.setPadding(new Insets(10));
+        Label headerAdd = new Label("Добавить аудиторию:");
 
-        VBox content = new VBox(buttons);
-        tab.setContent(content);
+        GridPane addForm = new GridPane();
+        addForm.setHgap(10);
+        addForm.setVgap(10);
+
+        Label roomNumberLabel = new Label("Номер:");
+        TextField roomNumberField = new TextField();
+        roomNumberField.setPromptText("Например, 101 или 302A");
+        roomNumberField.setPrefWidth(250);
+        roomNumberField.getStyleClass().add("text-field");
+
+        Label floorLabel = new Label("Этаж:");
+        TextField floorField = new TextField();
+        floorField.setPromptText("1–4");
+        floorField.setPrefWidth(250);
+        floorField.getStyleClass().add("text-field");
+
+        Label blockLabel = new Label("Блок:");
+        TextField blockField = new TextField();
+        blockField.setPromptText("Одна буква");
+        blockField.setPrefWidth(250);
+        blockField.getStyleClass().add("text-field");
+
+        Label subjectLabel = new Label("Предмет:");
+        TextField subjectField = new TextField();
+        subjectField.setPromptText("Название предмета");
+        subjectField.setPrefWidth(250);
+        subjectField.getStyleClass().add("text-field");
+
+        Button addRoomBtn = new Button("Добавить");
+        addRoomBtn.getStyleClass().add("action-button");
+        addRoomBtn.setDisable(true);
+
+        boolean isAdmin = "admin".equals(UserSession.getUsername());
+        if (isAdmin) {
+            addRoomBtn.setDisable(false);
+            roomNumberField.setDisable(false);
+            floorField.setDisable(false);
+            blockField.setDisable(false);
+            subjectField.setDisable(false);
+        } else {
+            roomNumberField.setDisable(true);
+            floorField.setDisable(true);
+            blockField.setDisable(true);
+            subjectField.setDisable(true);
+        }
+
+        addForm.add(roomNumberLabel, 0, 0);
+        addForm.add(roomNumberField, 1, 0);
+        addForm.add(floorLabel,      0, 1);
+        addForm.add(floorField,      1, 1);
+        addForm.add(blockLabel,      0, 2);
+        addForm.add(blockField,      1, 2);
+        addForm.add(subjectLabel,    0, 3);
+        addForm.add(subjectField,    1, 3);
+        addForm.add(addRoomBtn,      1, 4);
+
+        container.getChildren().addAll(
+                buttonsBox,
+                separator,
+                headerAdd,
+                addForm
+        );
+
+        ScrollPane scrollPane = new ScrollPane(container);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+        double scrollMultiplier = 0.020;
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
+            double delta = event.getDeltaY() * scrollMultiplier;
+            scrollPane.setVvalue(scrollPane.getVvalue() - delta);
+            event.consume();
+        });
+
+        tab.setContent(scrollPane);
         tab.setClosable(false);
+
+        allRoomsBtn.setOnAction(e ->
+                outputArea.setText(RoomService.getAllRoomsWithCurrentTeachers())
+        );
+
+        busyRoomsBtn.setOnAction(e ->
+                outputArea.setText(RoomService.getOccupiedRooms())
+        );
+
+        freeRoomsBtn.setOnAction(e ->
+                outputArea.setText(RoomService.getFreeRooms())
+        );
+
+        addRoomBtn.setOnAction(e -> {
+            String room    = roomNumberField.getText().trim();
+            String floor   = floorField.getText().trim();
+            String block   = blockField.getText().trim();
+            String subject = subjectField.getText().trim();
+            outputArea.setText(RoomService.addRoom(room, floor, block, subject));
+        });
+
         return tab;
     }
 }

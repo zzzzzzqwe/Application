@@ -21,4 +21,9 @@ public class UserSession {
         loggedIn = false;
         username = null;
     }
+
+    public static void clear() {
+        username = null;
+    }
+
 }

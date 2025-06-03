@@ -1,20 +1,30 @@
 package com.coursework.Application;
-import com.coursework.Application.view.*;
+
+import com.coursework.Application.util.UserSession;
+import com.coursework.Application.view.RoomTab;
+import com.coursework.Application.view.TeacherTab;
+import com.coursework.Application.view.SearchTab;
+import com.coursework.Application.view.ScheduleTab;
+import com.coursework.Application.view.LoginWindow;
+import com.coursework.Application.service.AuthService;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
-import com.example.Application.view.*;
-import java.util.Objects;
-
 
 public class ApplicationDriver extends Application {
 
     private TextArea outputArea;
-
 
     public static void main(String[] args) {
         launch(args);
@@ -22,47 +32,75 @@ public class ApplicationDriver extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.getIcons().add(
-                new Image(getClass().getResourceAsStream("/icon.png"))
-        );
+        // automatic admin for testing, remove later todo
+        UserSession.login("admin");
+
+        primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icon.png")));
+
+        Label titleLabel = new Label("Университетская информационная система");
+        titleLabel.getStyleClass().add("section-title");
+
+        Button loginBtn = new Button("Войти");
+        loginBtn.getStyleClass().add("action-button");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox topBar = new HBox(10, titleLabel, spacer, loginBtn);
+        topBar.setPadding(new Insets(10));
+        topBar.getStyleClass().add("root-pane");
+
+        TabPane tabPane = new TabPane();
+        tabPane.getStyleClass().add("tab-pane");
 
         outputArea = new TextArea();
         outputArea.setEditable(false);
         outputArea.setWrapText(true);
-        // outputArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
         outputArea.setPrefRowCount(10);
+        outputArea.getStyleClass().add("status-bar");
 
-        Button loginBtn = new Button("Войти");
+        rebuildTabs(tabPane);
 
-        loginBtn.setOnAction(e -> {
-            if (LoginWindow.showLoginDialog()) {
-                outputArea.appendText("Вход выполнен\n");
-                loginBtn.setDisable(true); // отключаем после входа
-            }
-        });
+        BorderPane root = new BorderPane();
+        root.getStyleClass().add("root-pane");
+        root.setTop(topBar);
+        root.setCenter(tabPane);
+        root.setBottom(outputArea);
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox topBar = new HBox(spacer, loginBtn);
-        topBar.setPadding(new Insets(10, 10, 5, 10));
-
-        TabPane tabPane = new TabPane();
-        tabPane.getTabs().addAll(
-                RoomTab.createRoomsTab(outputArea),
-                TeacherTab.createTeachersTab(outputArea),
-                SearchTab.createSearchTab(outputArea),
-                ScheduleTab.createScheduleTab(outputArea)
+        Scene scene = new Scene(root, 800, 650);
+        scene.getStylesheets().add(
+                ApplicationDriver.class.getResource("/style.css").toExternalForm()
         );
 
-        VBox layout = new VBox(topBar, tabPane, outputArea);
-        VBox.setVgrow(outputArea, Priority.ALWAYS);
-        layout.setPadding(new Insets(5));
-        layout.setSpacing(5);
-
-        Scene scene = new Scene(layout, 780, 540);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
-        primaryStage.setScene(scene);
         primaryStage.setTitle("Университетская информационная система");
+        primaryStage.setScene(scene);
         primaryStage.show();
+
+        loginBtn.setOnAction(e -> {
+            if (UserSession.getUsername() == null) {
+                if (LoginWindow.showLoginDialog()) {
+                    outputArea.setText("Вход выполнен: " + UserSession.getUsername());
+                    loginBtn.setText("Выйти");
+                    rebuildTabs(tabPane);
+                } else {
+                    outputArea.setText("Вход не выполнен");
+                }
+            } else {
+                UserSession.clear();
+                outputArea.setText("Выход выполнен");
+                loginBtn.setText("Войти");
+                rebuildTabs(tabPane);
+            }
+        });
+    }
+
+    private void rebuildTabs(TabPane tabPane) {
+        tabPane.getTabs().clear();
+        Tab roomsTab    = RoomTab.createRoomsTab(outputArea);
+        Tab teachersTab = TeacherTab.createTeachersTab(outputArea);
+        Tab searchTab   = SearchTab.createSearchTab(outputArea);
+        Tab scheduleTab = ScheduleTab.createScheduleTab(outputArea);
+        tabPane.getTabs().addAll(roomsTab, teachersTab, searchTab, scheduleTab);
     }
 }
