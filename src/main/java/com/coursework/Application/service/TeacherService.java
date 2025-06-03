@@ -49,13 +49,12 @@ public class TeacherService {
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-              //  int    id        = rs.getInt("id");
                 String lastName  = rs.getString("last_name");
                 String firstName = rs.getString("first_name");
                 list.add(firstName + " " + lastName);
             }
         } catch (SQLException e) {
-            // В случае ошибки возвращаем пустой список
+            // empty list if something goes wrong
         }
         return list;
     }
@@ -96,7 +95,7 @@ public class TeacherService {
                             .append("\n");
                 }
                 if (!found) {
-                    return "Преподаватели по запросу «" + name + "» не найдены.";
+                    return "Преподаватели по запросу " + name + " не найдены.";
                 }
             }
         } catch (SQLException e) {

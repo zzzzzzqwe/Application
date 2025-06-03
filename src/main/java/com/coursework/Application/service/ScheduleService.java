@@ -109,7 +109,7 @@ public class ScheduleService {
              PreparedStatement psInsert = con.prepareStatement(insertSql)) {
 
             psInsert.setString(1, dayOfWeek.trim());
-            // В PostgreSQL Time.valueOf ожидает формат "HH:MM:SS"
+            // В Pgsql Time.valueOf ожидает формат "HH:MM:SS"
             psInsert.setTime(2, java.sql.Time.valueOf(startTime + ":00"));
             psInsert.setTime(3, java.sql.Time.valueOf(endTime + ":00"));
             psInsert.setInt(4, teacherId);

@@ -116,7 +116,6 @@ public class ScheduleTab {
                 outputArea.setText("Ошибка: выберите преподавателя.");
                 return;
             }
-            // Предполагаем, что формат элемента ComboBox = "ID - Фамилия Имя"
             String[] parts = teacherItem.split(" - ", 2);
             String teacherId = parts[0];
 

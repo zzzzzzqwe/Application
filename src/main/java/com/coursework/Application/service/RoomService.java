@@ -21,7 +21,7 @@ public class RoomService {
                 list.add(rs.getString("room_number"));
             }
         } catch (SQLException e) {
-            // В случае ошибки возвращаем пустой список
+            // empty list if something goes wrong
         }
         return list;
     }

@@ -16,7 +16,7 @@ public class AuthService {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String realPassword = rs.getString("password");
-                    return password.equals(realPassword); // позже заменить на хеш-сравнение
+                    return password.equals(realPassword);
                 }
             }
 
