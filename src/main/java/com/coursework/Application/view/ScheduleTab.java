@@ -1,13 +1,15 @@
 package com.coursework.Application.view;
 
 import com.coursework.Application.service.ScheduleService;
+import com.coursework.Application.service.TeacherService;
+import com.coursework.Application.service.RoomService;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
@@ -35,49 +37,49 @@ public class ScheduleTab {
         addForm.setVgap(10);
 
         Label dayLabel = new Label("День недели:");
-        TextField dayField = new TextField();
+        javafx.scene.control.TextField dayField = new javafx.scene.control.TextField();
         dayField.setPromptText("Понедельник");
         dayField.setPrefWidth(250);
         dayField.getStyleClass().add("text-field");
 
-        Label startLabel = new Label("Начало:");
-        TextField startField = new TextField();
+        Label startLabel = new Label("Начало (HH:MM):");
+        javafx.scene.control.TextField startField = new javafx.scene.control.TextField();
         startField.setPromptText("08:30");
         startField.setPrefWidth(250);
         startField.getStyleClass().add("text-field");
 
-        Label endLabel = new Label("Конец:");
-        TextField endField = new TextField();
+        Label endLabel = new Label("Конец (HH:MM):");
+        javafx.scene.control.TextField endField = new javafx.scene.control.TextField();
         endField.setPromptText("10:00");
         endField.setPrefWidth(250);
         endField.getStyleClass().add("text-field");
 
-        Label teacherIdLabel = new Label("ID преподавателя:");
-        TextField teacherIdField = new TextField();
-        teacherIdField.setPromptText("ID");
-        teacherIdField.setPrefWidth(250);
-        teacherIdField.getStyleClass().add("text-field");
+        Label teacherLabel = new Label("Преподаватель:");
+        ComboBox<String> teacherCombo = new ComboBox<>();
+        teacherCombo.setPrefWidth(250);
+        teacherCombo.getStyleClass().add("combo-field");
+        teacherCombo.getItems().addAll(TeacherService.getAllTeacherDisplay());
 
         Label roomNumberLabel = new Label("Номер аудитории:");
-        TextField roomNumberField = new TextField();
-        roomNumberField.setPromptText("101");
-        roomNumberField.setPrefWidth(250);
-        roomNumberField.getStyleClass().add("text-field");
+        ComboBox<String> roomCombo = new ComboBox<>();
+        roomCombo.setPrefWidth(250);
+        roomCombo.getStyleClass().add("combo-field");
+        roomCombo.getItems().addAll(RoomService.getAllRoomNumbers());
 
         Button addLessonBtn = new Button("Добавить пару");
         addLessonBtn.getStyleClass().add("action-button");
 
-        addForm.add(dayLabel, 0, 0);
-        addForm.add(dayField, 1, 0);
-        addForm.add(startLabel, 0, 1);
-        addForm.add(startField, 1, 1);
-        addForm.add(endLabel, 0, 2);
-        addForm.add(endField, 1, 2);
-        addForm.add(teacherIdLabel, 0, 3);
-        addForm.add(teacherIdField, 1, 3);
-        addForm.add(roomNumberLabel, 0, 4);
-        addForm.add(roomNumberField, 1, 4);
-        addForm.add(addLessonBtn, 1, 5);
+        addForm.add(dayLabel,         0, 0);
+        addForm.add(dayField,         1, 0);
+        addForm.add(startLabel,       0, 1);
+        addForm.add(startField,       1, 1);
+        addForm.add(endLabel,         0, 2);
+        addForm.add(endField,         1, 2);
+        addForm.add(teacherLabel,     0, 3);
+        addForm.add(teacherCombo,     1, 3);
+        addForm.add(roomNumberLabel,  0, 4);
+        addForm.add(roomCombo,        1, 4);
+        addForm.add(addLessonBtn,     1, 5);
 
         container.getChildren().addAll(
                 showScheduleBtn,
@@ -91,7 +93,7 @@ public class ScheduleTab {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        double scrollMultiplier = 0.020;
+        double scrollMultiplier = 0.005;
         scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
             double delta = event.getDeltaY() * scrollMultiplier;
             scrollPane.setVvalue(scrollPane.getVvalue() - delta);
@@ -106,11 +108,24 @@ public class ScheduleTab {
         );
 
         addLessonBtn.setOnAction(e -> {
-            String day       = dayField.getText().trim();
-            String start     = startField.getText().trim();
-            String end       = endField.getText().trim();
-            String teacherId = teacherIdField.getText().trim();
-            String room      = roomNumberField.getText().trim();
+            String day      = dayField.getText().trim();
+            String start    = startField.getText().trim();
+            String end      = endField.getText().trim();
+            String teacherItem = teacherCombo.getValue();
+            if (teacherItem == null || teacherItem.isBlank()) {
+                outputArea.setText("Ошибка: выберите преподавателя.");
+                return;
+            }
+            // Предполагаем, что формат элемента ComboBox = "ID - Фамилия Имя"
+            String[] parts = teacherItem.split(" - ", 2);
+            String teacherId = parts[0];
+
+            String room = roomCombo.getValue();
+            if (room == null || room.isBlank()) {
+                outputArea.setText("Ошибка: выберите аудиторию.");
+                return;
+            }
+
             outputArea.setText(
                     ScheduleService.addLesson(day, start, end, teacherId, room)
             );

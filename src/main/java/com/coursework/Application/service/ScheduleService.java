@@ -3,11 +3,13 @@ package com.coursework.Application.service;
 import com.coursework.Application.database.DatabaseConnection;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ScheduleService {
+
 
     public static String getSchedule() {
         StringBuilder result = new StringBuilder();
@@ -49,36 +51,70 @@ public class ScheduleService {
         return result.toString();
     }
 
-    public static String addLesson(String dayOfWeek, String startTime, String endTime, String teacherIdStr, String roomNumber) {
+    public static String addLesson(
+            String dayOfWeek,
+            String startTime,
+            String endTime,
+            String teacherName,
+            String roomNumber
+    ) {
         if (dayOfWeek == null || dayOfWeek.isBlank()) {
             return "Ошибка: день недели обязателен.";
         }
-        if (!startTime.matches("^[0-2][0-9]:[0-5][0-9]$")) {
+        if (startTime == null || !startTime.matches("^[0-2][0-9]:[0-5][0-9]$")) {
             return "Ошибка: неверный формат времени начала (должно быть HH:MM).";
         }
-        if (!endTime.matches("^[0-2][0-9]:[0-5][0-9]$")) {
+        if (endTime == null || !endTime.matches("^[0-2][0-9]:[0-5][0-9]$")) {
             return "Ошибка: неверный формат времени конца (должно быть HH:MM).";
         }
-        int teacherId;
-        try {
-            teacherId = Integer.parseInt(teacherIdStr);
-        } catch (NumberFormatException e) {
-            return "Ошибка: ID преподавателя должен быть числом.";
+        if (teacherName == null || teacherName.isBlank() || !teacherName.contains(" ")) {
+            return "Ошибка: выберите преподавателя из списка.";
         }
+
+        String[] nameParts = teacherName.trim().split("\\s+", 2);
+        if (nameParts.length < 2) {
+            return "Ошибка: неверный формат имени преподавателя.";
+        }
+        String lastName  = nameParts[1].trim();
+        String firstName = nameParts[0].trim();
+
+        int teacherId;
+        String findSql = "SELECT id FROM teachers WHERE last_name = ? AND first_name = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement psFind = con.prepareStatement(findSql)) {
+
+            psFind.setString(1, lastName);
+            psFind.setString(2, firstName);
+            try (ResultSet rs = psFind.executeQuery()) {
+                if (rs.next()) {
+                    teacherId = rs.getInt("id");
+                } else {
+                    return "Ошибка: преподаватель \"" + teacherName + "\" не найден в базе.";
+                }
+            }
+        } catch (SQLException e) {
+            return "Ошибка при поиске преподавателя: " + e.getMessage();
+        }
+
         if (roomNumber == null || !roomNumber.matches("^[0-9]{3}[A-Z]?$")) {
             return "Ошибка: неверный формат номера аудитории.";
         }
 
-        String sql = "INSERT INTO schedule (day_of_week, start_time, end_time, teacher_id, room_number) VALUES (?, ?, ?, ?, ?)";
-        try (var con = DatabaseConnection.getConnection();
-             var ps = con.prepareStatement(sql)) {
+        String insertSql = """
+            INSERT INTO schedule (day_of_week, start_time, end_time, teacher_id, room_number)
+            VALUES (?, ?, ?, ?, ?)
+        """;
 
-            ps.setString(1, dayOfWeek.trim());
-            ps.setTime(2, java.sql.Time.valueOf(startTime + ":00"));
-            ps.setTime(3, java.sql.Time.valueOf(endTime + ":00"));
-            ps.setInt(4, teacherId);
-            ps.setString(5, roomNumber);
-            ps.executeUpdate();
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement psInsert = con.prepareStatement(insertSql)) {
+
+            psInsert.setString(1, dayOfWeek.trim());
+            // В PostgreSQL Time.valueOf ожидает формат "HH:MM:SS"
+            psInsert.setTime(2, java.sql.Time.valueOf(startTime + ":00"));
+            psInsert.setTime(3, java.sql.Time.valueOf(endTime + ":00"));
+            psInsert.setInt(4, teacherId);
+            psInsert.setString(5, roomNumber);
+            psInsert.executeUpdate();
             return "Пара успешно добавлена.";
         } catch (SQLException e) {
             return "Ошибка при добавлении пары: " + e.getMessage();

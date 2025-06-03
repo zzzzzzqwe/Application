@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TeacherService {
 
@@ -38,6 +40,24 @@ public class TeacherService {
             return "Ошибка при получении преподавателей: " + e.getMessage();
         }
         return result.toString();
+    }
+
+    public static List<String> getAllTeacherDisplay() {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT id, last_name, first_name FROM teachers ORDER BY last_name, first_name";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+              //  int    id        = rs.getInt("id");
+                String lastName  = rs.getString("last_name");
+                String firstName = rs.getString("first_name");
+                list.add(firstName + " " + lastName);
+            }
+        } catch (SQLException e) {
+            // В случае ошибки возвращаем пустой список
+        }
+        return list;
     }
 
     public static String searchTeachersByName(String name) {
