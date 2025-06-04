@@ -145,6 +145,26 @@ public class RoomService {
         return result.toString();
     }
 
+    public static String deleteRoom(String roomNumber) {
+        if (roomNumber == null || !roomNumber.matches("^[0-9]{3}[A-Z]?$")) {
+            return "Ошибка: неверный формат номера аудитории.";
+        }
+        String deleteSql = "DELETE FROM rooms WHERE room_number = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(deleteSql)) {
+
+            ps.setString(1, roomNumber);
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                return "Аудитория успешно удалена.";
+            } else {
+                return "Аудитория не найдена.";
+            }
+        } catch (SQLException e) {
+            return "Ошибка при удалении аудитории: " + e.getMessage();
+        }
+    }
+
     public static String getFreeRooms() {
         StringBuilder result = new StringBuilder();
         String sql = """
@@ -213,5 +233,7 @@ public class RoomService {
             }
             return "Ошибка при добавлении аудитории: " + e.getMessage();
         }
+
     }
+
 }

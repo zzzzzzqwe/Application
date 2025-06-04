@@ -3,6 +3,7 @@ package com.coursework.Application.view;
 import com.coursework.Application.service.ScheduleService;
 import com.coursework.Application.service.TeacherService;
 import com.coursework.Application.service.RoomService;
+import com.coursework.Application.util.UserSession;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -71,6 +72,16 @@ public class ScheduleTab {
         Button addLessonBtn = new Button("Добавить");
         addLessonBtn.getStyleClass().add("action-button");
 
+        boolean isAdmin = "admin".equals(UserSession.getUsername());
+        if (!isAdmin) {
+            dayField.setDisable(true);
+            startField.setDisable(true);
+            endField.setDisable(true);
+            teacherCombo.setDisable(true);
+            roomCombo.setDisable(true);
+            addLessonBtn.setDisable(true);
+        }
+
         addForm.add(dayLabel,          0, 0);
         addForm.add(dayField,          1, 0);
         addForm.add(startLabel,        0, 1);
@@ -109,6 +120,13 @@ public class ScheduleTab {
 
         Button deleteLessonBtn = new Button("Удалить");
         deleteLessonBtn.getStyleClass().add("action-button");
+
+        if (!isAdmin) {
+            dayDelField.setDisable(true);
+            startDelField.setDisable(true);
+            roomDelCombo.setDisable(true);
+            deleteLessonBtn.setDisable(true);
+        }
 
         deleteForm.add(dayDelLabel,     0, 0);
         deleteForm.add(dayDelField,     1, 0);

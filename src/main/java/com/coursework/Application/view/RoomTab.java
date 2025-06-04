@@ -5,6 +5,7 @@ import com.coursework.Application.util.UserSession;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -13,7 +14,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.Separator;
 
 public class RoomTab {
 
@@ -34,7 +34,7 @@ public class RoomTab {
         freeRoomsBtn.getStyleClass().add("action-button");
         buttonsBox.getChildren().addAll(allRoomsBtn, busyRoomsBtn, freeRoomsBtn);
 
-        Separator separator = new Separator();
+        Separator separator1 = new Separator();
 
         Label headerAdd = new Label("Добавить аудиторию:");
 
@@ -94,11 +94,66 @@ public class RoomTab {
         addForm.add(subjectField,    1, 3);
         addForm.add(addRoomBtn,      1, 4);
 
+        Separator separator2 = new Separator();
+
+        Label deleteLabel = new Label("Удалить аудиторию:");
+
+        GridPane deleteForm = new GridPane();
+        deleteForm.setHgap(10);
+        deleteForm.setVgap(10);
+
+        Label roomDelLabel = new Label("Номер:");
+        TextField roomDelField = new TextField();
+        roomDelField.setPromptText("Например, 101 или 302A");
+        roomDelField.setPrefWidth(250);
+        roomDelField.getStyleClass().add("text-field");
+
+        Button deleteRoomBtn = new Button("Удалить");
+        deleteRoomBtn.getStyleClass().add("action-button");
+
+        if (isAdmin) {
+            roomDelField.setDisable(false);
+            deleteRoomBtn.setDisable(false);
+        } else {
+            roomDelField.setDisable(true);
+            deleteRoomBtn.setDisable(true);
+        }
+
+        deleteForm.add(roomDelLabel, 0, 0);
+        deleteForm.add(roomDelField, 1, 0);
+        deleteForm.add(deleteRoomBtn, 1, 1);
+
         container.getChildren().addAll(
                 buttonsBox,
-                separator,
+                separator1,
                 headerAdd,
-                addForm
+                addForm,
+                separator2,
+                deleteLabel,
+                deleteForm
+        );
+
+        addRoomBtn.setOnAction(e -> {
+            String room    = roomNumberField.getText().trim();
+            String floor   = floorField.getText().trim();
+            String block   = blockField.getText().trim();
+            String subject = subjectField.getText().trim();
+            outputArea.setText(RoomService.addRoom(room, floor, block, subject));
+        });
+
+        deleteRoomBtn.setOnAction(e -> {
+            String roomNumber = roomDelField.getText().trim();
+            outputArea.setText(RoomService.deleteRoom(roomNumber));
+        });
+
+        allRoomsBtn.setOnAction(e ->
+                outputArea.setText(RoomService.getAllRoomsWithCurrentTeachers())
+        );
+        busyRoomsBtn.setOnAction(e ->
+                outputArea.setText(RoomService.getOccupiedRooms())
+        );
+        freeRoomsBtn.setOnAction(e ->
+                outputArea.setText(RoomService.getFreeRooms())
         );
 
         ScrollPane scrollPane = new ScrollPane(container);
@@ -115,26 +170,6 @@ public class RoomTab {
 
         tab.setContent(scrollPane);
         tab.setClosable(false);
-
-        allRoomsBtn.setOnAction(e ->
-                outputArea.setText(RoomService.getAllRoomsWithCurrentTeachers())
-        );
-
-        busyRoomsBtn.setOnAction(e ->
-                outputArea.setText(RoomService.getOccupiedRooms())
-        );
-
-        freeRoomsBtn.setOnAction(e ->
-                outputArea.setText(RoomService.getFreeRooms())
-        );
-
-        addRoomBtn.setOnAction(e -> {
-            String room    = roomNumberField.getText().trim();
-            String floor   = floorField.getText().trim();
-            String block   = blockField.getText().trim();
-            String subject = subjectField.getText().trim();
-            outputArea.setText(RoomService.addRoom(room, floor, block, subject));
-        });
 
         return tab;
     }
