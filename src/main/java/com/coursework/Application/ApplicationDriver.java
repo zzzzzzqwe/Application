@@ -61,7 +61,8 @@ public class ApplicationDriver extends Application {
         outputArea.setPrefRowCount(10);
         outputArea.getStyleClass().add("status-bar");
 
-//        double scrollMultiplier = 2;
+       //  a bit buggy for now, weird scroll up
+//        double scrollMultiplier = 0.9;
 //        outputArea.addEventFilter(ScrollEvent.SCROLL, event -> {
 //            double delta = event.getDeltaY() * scrollMultiplier;
 //            outputArea.setScrollTop(outputArea.getScrollTop() - delta);
