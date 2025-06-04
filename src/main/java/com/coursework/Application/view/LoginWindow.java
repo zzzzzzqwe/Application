@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -17,7 +18,7 @@ public class LoginWindow {
         Stage stage = new Stage();
         stage.setTitle("Вход");
         stage.setResizable(false);
-
+        stage.getIcons().add(new Image(LoginWindow.class.getResourceAsStream("/lock.png")));
         Label userLabel = new Label("Имя пользователя:");
         TextField userField = new TextField();
         userField.getStyleClass().add("text-field");
