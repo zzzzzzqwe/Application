@@ -3,13 +3,7 @@ package com.coursework.Application.view;
 import com.coursework.Application.service.RoomService;
 import com.coursework.Application.util.UserSession;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -27,8 +21,8 @@ public class RoomTab {
 
         HBox buttonsBox = new HBox(10);
         Button allRoomsBtn  = new Button("Все кабинеты");
-        Button busyRoomsBtn = new Button("Занятые");
-        Button freeRoomsBtn = new Button("Свободные");
+        Button busyRoomsBtn = new Button("С преподавателем");
+        Button freeRoomsBtn = new Button("Без преподавателя");
         allRoomsBtn.getStyleClass().add("action-button");
         busyRoomsBtn.getStyleClass().add("action-button");
         freeRoomsBtn.getStyleClass().add("action-button");
@@ -101,27 +95,28 @@ public class RoomTab {
         GridPane deleteForm = new GridPane();
         deleteForm.setHgap(10);
         deleteForm.setVgap(10);
-
         Label roomDelLabel = new Label("Номер:");
-        TextField roomDelField = new TextField();
-        roomDelField.setPromptText("Например, 101 или 302A");
-        roomDelField.setPrefWidth(250);
-        roomDelField.getStyleClass().add("text-field");
+        ComboBox<String> roomDelCombo = new ComboBox<>();
+        roomDelCombo.setPrefWidth(250);
+        roomDelCombo.getStyleClass().add("combo-field");
+        roomDelCombo.getItems().add("Выберите аудиторию");
+        roomDelCombo.getItems().addAll(RoomService.getAllRoomNumbers());
+        roomDelCombo.getSelectionModel().select(0);
 
         Button deleteRoomBtn = new Button("Удалить");
         deleteRoomBtn.getStyleClass().add("action-button");
 
         if (isAdmin) {
-            roomDelField.setDisable(false);
+            roomDelCombo.setDisable(false);
             deleteRoomBtn.setDisable(false);
         } else {
-            roomDelField.setDisable(true);
+            roomDelCombo.setDisable(true);
             deleteRoomBtn.setDisable(true);
         }
 
-        deleteForm.add(roomDelLabel, 0, 0);
-        deleteForm.add(roomDelField, 1, 0);
-        deleteForm.add(deleteRoomBtn, 1, 1);
+        deleteForm.add(roomDelLabel,   0, 0);
+        deleteForm.add(roomDelCombo,   1, 0);
+        deleteForm.add(deleteRoomBtn,  1, 1);
 
         container.getChildren().addAll(
                 buttonsBox,
@@ -142,7 +137,12 @@ public class RoomTab {
         });
 
         deleteRoomBtn.setOnAction(e -> {
-            String roomNumber = roomDelField.getText().trim();
+            String roomNumber = roomDelCombo.getValue().trim();
+            String selectedRoom = roomDelCombo.getValue();
+            if (selectedRoom == null || selectedRoom.equals("Выберите аудиторию")) {
+                outputArea.setText("Ошибка: выберите аудиторию.");
+                return;
+            }
             outputArea.setText(RoomService.deleteRoom(roomNumber));
         });
 

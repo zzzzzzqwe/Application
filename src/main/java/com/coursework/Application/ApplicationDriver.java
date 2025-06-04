@@ -16,6 +16,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -60,6 +61,13 @@ public class ApplicationDriver extends Application {
         outputArea.setPrefRowCount(10);
         outputArea.getStyleClass().add("status-bar");
 
+//        double scrollMultiplier = 2;
+//        outputArea.addEventFilter(ScrollEvent.SCROLL, event -> {
+//            double delta = event.getDeltaY() * scrollMultiplier;
+//            outputArea.setScrollTop(outputArea.getScrollTop() - delta);
+//            event.consume();
+//        });
+
         rebuildTabs(tabPane);
 
         BorderPane root = new BorderPane();
@@ -68,7 +76,7 @@ public class ApplicationDriver extends Application {
         root.setCenter(tabPane);
         root.setBottom(outputArea);
 
-        Scene scene = new Scene(root, 800, 650);
+        Scene scene = new Scene(root, 820, 650);
         scene.getStylesheets().add(
                 ApplicationDriver.class.getResource("/style.css").toExternalForm()
         );

@@ -29,15 +29,14 @@ public class RoomService {
     public static String getAllRoomsWithCurrentTeachers() {
         StringBuilder result = new StringBuilder();
         String sql = """
-            SELECT 
-                r.room_number,
-                r.floor,
-                r.block,
-                r.subject,
-                COALESCE(CONCAT(t.last_name, ' ', t.first_name), '-') AS teacher
-            FROM rooms r
-            LEFT JOIN teachers t ON r.room_number = t.room_number
-            ORDER BY r.room_number;
+               SELECT\s
+                r.room_number, r.floor, r.block, r.subject,
+                COALESCE(MIN(CONCAT(t.last_name, ' ', t.first_name)),'-') AS teacher
+                FROM rooms r
+                LEFT JOIN schedule s ON r.room_number = s.room_number
+                LEFT JOIN teachers t ON s.teacher_id = t.id
+                GROUP BY r.room_number, r.floor, r.block, r.subject
+                ORDER BY r.room_number;
         """;
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -68,12 +67,8 @@ public class RoomService {
 
         StringBuilder result = new StringBuilder();
         String sql = """
-        SELECT 
-            r.room_number,
-            r.floor,
-            r.block,
-            r.subject,
-            COALESCE(CONCAT(t.last_name, ' ', t.first_name), '-') AS teacher
+        SELECT r.room_number, r.floor, r.block, r.subject,
+        COALESCE(CONCAT(t.last_name, ' ', t.first_name), '-') AS teacher
         FROM rooms r
         LEFT JOIN teachers t ON r.room_number = t.room_number
         WHERE LOWER(r.room_number) LIKE LOWER(?)
@@ -161,6 +156,10 @@ public class RoomService {
                 return "Аудитория не найдена.";
             }
         } catch (SQLException e) {
+            // 23503 - ограничение внешнего ключа (аудитория используется в расписании)
+            if ("23503".equals(e.getSQLState())) {
+                return "Нельзя удалить аудиторию: она используется в расписании.";
+            }
             return "Ошибка при удалении аудитории: " + e.getMessage();
         }
     }
