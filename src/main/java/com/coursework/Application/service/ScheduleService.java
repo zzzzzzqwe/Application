@@ -22,7 +22,16 @@ public class ScheduleService {
                     FROM schedule s
                     JOIN teachers t ON s.teacher_id = t.id
                     JOIN rooms r ON s.room_number = r.room_number
-                    ORDER BY s.day_of_week, s.start_time;
+                    ORDER BY CASE s.day_of_week
+                                         WHEN 'Понедельник' THEN 1
+                                         WHEN 'Вторник'     THEN 2
+                                         WHEN 'Среда'       THEN 3
+                                         WHEN 'Четверг'     THEN 4
+                                         WHEN 'Пятница'     THEN 5
+                                         WHEN 'Суббота'     THEN 6
+                                         WHEN 'Воскресенье' THEN 7
+                                         ELSE 8
+                                     END
                 """;
 
         try (Connection con = DatabaseConnection.getConnection();
