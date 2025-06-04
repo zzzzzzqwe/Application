@@ -26,7 +26,14 @@ public class ScheduleTab {
         container.getStyleClass().add("tab-content-area");
         container.setPadding(new Insets(15));
 
-        // === Форма добавления пары ===
+        Button showScheduleBtn = new Button("Показать расписание");
+        showScheduleBtn.getStyleClass().add("action-button");
+        showScheduleBtn.setOnAction(e ->
+                outputArea.setText(ScheduleService.getSchedule())
+        );
+
+        Separator separator1 = new Separator();
+
         Label headerAdd = new Label("Добавить пару:");
         GridPane addForm = new GridPane();
         addForm.setHgap(10);
@@ -136,6 +143,8 @@ public class ScheduleTab {
         deleteForm.add(deleteLessonBtn,1, 3);
 
         container.getChildren().addAll(
+                showScheduleBtn,
+                separator1,
                 headerAdd,
                 addForm,
                 separator,

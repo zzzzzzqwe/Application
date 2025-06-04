@@ -73,7 +73,6 @@ public class ScheduleService {
             return "Ошибка: неверный формат номера аудитории.";
         }
 
-        // Разбиваем "Иван Петров" на две части: [0]=Иван, [1]=Петров
         String[] nameParts = teacherName.trim().split("\\s+", 2);
         if (nameParts.length < 2) {
             return "Ошибка: неверный формат имени преподавателя.";
