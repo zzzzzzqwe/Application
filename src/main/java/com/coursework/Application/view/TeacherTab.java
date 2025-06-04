@@ -12,6 +12,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
@@ -109,6 +110,14 @@ public class TeacherTab {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+
+        double scrollMultiplier = 0.020;
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
+            double delta = event.getDeltaY() * scrollMultiplier;
+            scrollPane.setVvalue(scrollPane.getVvalue() - delta);
+            event.consume();
+        });
 
         tab.setContent(scrollPane);
         tab.setClosable(false);

@@ -99,8 +99,9 @@ public class ApplicationDriver extends Application {
         tabPane.getTabs().clear();
         Tab roomsTab    = RoomTab.createRoomsTab(outputArea);
         Tab teachersTab = TeacherTab.createTeachersTab(outputArea);
-        Tab searchTab   = SearchTab.createSearchTab(outputArea);
         Tab scheduleTab = ScheduleTab.createScheduleTab(outputArea);
-        tabPane.getTabs().addAll(roomsTab, teachersTab, searchTab, scheduleTab);
+        scheduleTab.setClosable(false);
+        Tab searchTab   = SearchTab.createSearchTab(outputArea);
+        tabPane.getTabs().addAll(roomsTab, teachersTab, scheduleTab, searchTab);
     }
 }
