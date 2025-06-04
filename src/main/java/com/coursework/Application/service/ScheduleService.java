@@ -1,3 +1,4 @@
+
 package com.coursework.Application.service;
 
 import com.coursework.Application.database.DatabaseConnection;
@@ -53,7 +54,7 @@ public class ScheduleService {
             String dayOfWeek,
             String startTime,
             String endTime,
-            int teacherId,
+            String teacherName,
             String roomNumber
     ) {
         if (dayOfWeek == null || dayOfWeek.isBlank()) {
@@ -65,8 +66,40 @@ public class ScheduleService {
         if (endTime == null || !endTime.matches("^[0-2][0-9]:[0-5][0-9]$")) {
             return "Ошибка: неверный формат времени конца (должно быть HH:MM).";
         }
+        if (teacherName == null || teacherName.isBlank() || !teacherName.contains(" ")) {
+            return "Ошибка: выберите преподавателя из списка.";
+        }
         if (roomNumber == null || !roomNumber.matches("^[0-9]{3}[A-Z]?$")) {
             return "Ошибка: неверный формат номера аудитории.";
+        }
+
+        // Разбиваем "Иван Петров" на две части: [0]=Иван, [1]=Петров
+        String[] nameParts = teacherName.trim().split("\\s+", 2);
+        if (nameParts.length < 2) {
+            return "Ошибка: неверный формат имени преподавателя.";
+        }
+        String firstName = nameParts[0];
+        String lastName  = nameParts[1];
+
+        int teacherId;
+        String findTeacherSql = """
+                    SELECT id 
+                    FROM teachers 
+                    WHERE last_name = ? AND first_name = ?;
+                """;
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement psFind = con.prepareStatement(findTeacherSql)) {
+            psFind.setString(1, lastName);
+            psFind.setString(2, firstName);
+            try (ResultSet rs = psFind.executeQuery()) {
+                if (rs.next()) {
+                    teacherId = rs.getInt("id");
+                } else {
+                    return "Ошибка: преподаватель \"" + teacherName + "\" не найден.";
+                }
+            }
+        } catch (SQLException e) {
+            return "Ошибка при поиске преподавателя: " + e.getMessage();
         }
 
         String checkSql = """
@@ -100,8 +133,8 @@ public class ScheduleService {
 
             try (PreparedStatement psInsert = con.prepareStatement(insertSql)) {
                 psInsert.setString(1, dayOfWeek.trim());
-                psInsert.setTime(2, java.sql.Time.valueOf(startTime + ":00"));
-                psInsert.setTime(3, java.sql.Time.valueOf(endTime + ":00"));
+                psInsert.setTime(2, startTimeSql);
+                psInsert.setTime(3, endTimeSql);
                 psInsert.setInt(4, teacherId);
                 psInsert.setString(5, roomNumber);
                 psInsert.executeUpdate();
@@ -122,9 +155,14 @@ public class ScheduleService {
         if (startTime == null || !startTime.matches("^[0-2][0-9]:[0-5][0-9]$")) {
             return "Ошибка: неверный формат времени начала (должно быть HH:MM).";
         }
+        if (roomNumber.equals("Выберите аудиторию"))
+        {
+            return "Выберите аудиторию";
+        }
         if (roomNumber == null || !roomNumber.matches("^[0-9]{3}[A-Z]?$")) {
             return "Ошибка: неверный формат номера аудитории.";
         }
+
 
         String deleteSql = """
             DELETE FROM schedule

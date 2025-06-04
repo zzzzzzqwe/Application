@@ -66,6 +66,8 @@ public class TeacherTab {
         roomCombo.setPrefWidth(250);
         roomCombo.getStyleClass().add("combo-field");
         roomCombo.getItems().addAll(RoomService.getAllRoomNumbers());
+        roomCombo.getItems().add(0, "Выберите кабинет");
+        roomCombo.getSelectionModel().select(0);
 
         Button addTeacherBtn = new Button("Добавить");
         addTeacherBtn.getStyleClass().add("action-button");
@@ -132,7 +134,7 @@ public class TeacherTab {
             String email      = emailField.getText().trim();
             String phone      = phoneField.getText().trim();
             String roomNumber = roomCombo.getValue();
-            if (roomNumber == null || roomNumber.isBlank()) {
+            if (roomNumber == null || roomNumber.isBlank() || roomNumber.equals("Выберите кабинет")) {
                 outputArea.setText("Ошибка: выберите кабинет для преподавателя.");
                 return;
             }
