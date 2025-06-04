@@ -53,7 +53,7 @@ public class LoginWindow {
             }
         });
 
-        stage.setScene(new Scene(layout, 150, 180));
+        stage.setScene(new Scene(layout));
         stage.showAndWait();
 
         return UserSession.getUsername() != null;
