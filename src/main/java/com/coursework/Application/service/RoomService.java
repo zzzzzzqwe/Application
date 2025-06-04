@@ -29,13 +29,14 @@ public class RoomService {
     public static String getAllRoomsWithCurrentTeachers() {
         StringBuilder result = new StringBuilder();
         String sql = """
-               SELECT\s
-                r.room_number, r.floor, r.block, r.subject,
-                COALESCE(MIN(CONCAT(t.last_name, ' ', t.first_name)),'-') AS teacher
+                SELECT r.room_number, r.floor, r.block, r.subject,
+                  COALESCE(t_full.teacher, '-') AS teacher
                 FROM rooms r
-                LEFT JOIN schedule s ON r.room_number = s.room_number
-                LEFT JOIN teachers t ON s.teacher_id = t.id
-                GROUP BY r.room_number, r.floor, r.block, r.subject
+                LEFT JOIN (
+                    SELECT room_number, CONCAT(last_name, ' ', first_name) AS teacher
+                    FROM teachers
+                ) AS t_full
+                  ON r.room_number = t_full.room_number
                 ORDER BY r.room_number;
         """;
         try (Connection con = DatabaseConnection.getConnection();
