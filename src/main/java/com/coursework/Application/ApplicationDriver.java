@@ -6,7 +6,7 @@ import com.coursework.Application.view.TeacherTab;
 import com.coursework.Application.view.SearchTab;
 import com.coursework.Application.view.ScheduleTab;
 import com.coursework.Application.view.LoginWindow;
-import com.coursework.Application.service.AuthService;
+import com.coursework.Application.service.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;

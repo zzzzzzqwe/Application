@@ -59,50 +59,51 @@ public class TeacherService {
         return list;
     }
 
-    public static String searchTeachersByName(String name) {
-        if (name == null || name.isBlank()) {
+    public static String searchTeachersByName(String fullName) {
+        if (fullName == null || fullName.isBlank()) {
             return "Пожалуйста, введите имя или фамилию преподавателя для поиска.";
         }
-        StringBuilder result = new StringBuilder();
+
+        String[] parts = fullName.trim().split("\\s+", 2);
+        String first = parts[0];
+        String last  = parts.length > 1 ? parts[1] : "";
+
         String sql = """
-            SELECT 
-                CONCAT(t.last_name, ' ', t.first_name) AS teacher,
-                t.email,
-                t.phone,
-                COALESCE(t.room_number, '-') AS room_number
-            FROM teachers t
-            WHERE LOWER(t.last_name) LIKE LOWER(?)
-               OR LOWER(t.first_name) LIKE LOWER(?)
-            ORDER BY t.last_name, t.first_name;
-        """;
+        SELECT 
+            CONCAT(t.last_name, ' ', t.first_name) AS teacher,
+            t.email, t.phone,
+            COALESCE(t.room_number,'-') AS room
+        FROM teachers t
+        WHERE LOWER(t.first_name) LIKE LOWER(?)
+          AND LOWER(t.last_name)  LIKE LOWER(?)
+        ORDER BY t.last_name, t.first_name;
+    """;
+
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            String wildcard = "%" + name.trim() + "%";
-            ps.setString(1, wildcard);
-            ps.setString(2, wildcard);
+            ps.setString(1, "%" + first + "%");
+            ps.setString(2, "%" + last  + "%");
             try (ResultSet rs = ps.executeQuery()) {
+                StringBuilder result = new StringBuilder();
                 boolean found = false;
                 while (rs.next()) {
                     found = true;
-                    String teacher = rs.getString("teacher");
-                    String email   = rs.getString("email");
-                    String phone   = rs.getString("phone");
-                    String room    = rs.getString("room_number");
-                    result.append(teacher)
-                            .append(" | ").append(email)
-                            .append(" | ").append(phone)
-                            .append(" | Кабинет: ").append(room)
+                    result.append(rs.getString("teacher"))
+                            .append(" | ").append(rs.getString("email"))
+                            .append(" | ").append(rs.getString("phone"))
+                            .append(" | Кабинет: ").append(rs.getString("room"))
                             .append("\n");
                 }
                 if (!found) {
-                    return "Преподаватели по запросу " + name + " не найдены.";
+                    return "Преподаватель " + fullName + " не найден.";
                 }
+                return result.toString();
             }
         } catch (SQLException e) {
-            return "Ошибка при поиске преподавателей: " + e.getMessage();
+            return "Ошибка при поиске преподавателя: " + e.getMessage();
         }
-        return result.toString();
     }
+
 
     public static String addTeacher(String first, String last, String email, String phone, String roomNumber) {
         if (first == null || first.isBlank()) {

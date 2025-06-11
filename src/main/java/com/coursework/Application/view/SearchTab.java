@@ -3,12 +3,7 @@ package com.coursework.Application.view;
 import com.coursework.Application.service.RoomService;
 import com.coursework.Application.service.TeacherService;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -24,23 +19,29 @@ public class SearchTab {
 
         Label roomLabel = new Label("Поиск аудитории (номер):");
         HBox roomSearchBox = new HBox(10);
-        TextField roomInput = new TextField();
-        roomInput.setPromptText("Введите номер кабинета");
-        roomInput.setPrefWidth(250);
-        roomInput.getStyleClass().add("text-field");
+        ComboBox<String> roomCombo = new ComboBox<>();
+        roomCombo.setPrefWidth(250);
+        roomCombo.getStyleClass().add("combo-field");
+        roomCombo.getItems().add("Выберите аудиторию");
+        roomCombo.getItems().addAll(RoomService.getAllRoomNumbers());
+        roomCombo.getSelectionModel().selectFirst();
+
         Button searchRoomBtn = new Button("Найти кабинет");
         searchRoomBtn.getStyleClass().add("action-button");
-        roomSearchBox.getChildren().addAll(roomInput, searchRoomBtn);
+        roomSearchBox.getChildren().addAll(roomCombo, searchRoomBtn);
 
         Label teacherLabel = new Label("Поиск преподавателя (имя или фамилия):");
         HBox teacherSearchBox = new HBox(10);
-        TextField teacherInput = new TextField();
-        teacherInput.setPromptText("Введите имя/фамилию");
-        teacherInput.setPrefWidth(250);
-        teacherInput.getStyleClass().add("text-field");
+        ComboBox<String> teacherCombo = new ComboBox<>();
+        teacherCombo.setPrefWidth(250);
+        teacherCombo.getStyleClass().add("combo-field");
+        teacherCombo.getItems().add("Выберите преподавателя");
+        teacherCombo.getItems().addAll(TeacherService.getAllTeacherDisplay());
+        teacherCombo.getSelectionModel().selectFirst();
+
         Button searchTeacherBtn = new Button("Найти преподавателя");
         searchTeacherBtn.getStyleClass().add("action-button");
-        teacherSearchBox.getChildren().addAll(teacherInput, searchTeacherBtn);
+        teacherSearchBox.getChildren().addAll(teacherCombo, searchTeacherBtn);
 
         container.getChildren().addAll(
                 roomLabel, roomSearchBox,
@@ -51,12 +52,12 @@ public class SearchTab {
         tab.setClosable(false);
 
         searchRoomBtn.setOnAction(e -> {
-            String input = roomInput.getText().trim();
+            String input = roomCombo.getValue().trim();
             outputArea.setText(RoomService.searchRoomByNumber(input));
         });
 
         searchTeacherBtn.setOnAction(e -> {
-            String input = teacherInput.getText().trim();
+            String input = teacherCombo.getValue().trim();
             outputArea.setText(TeacherService.searchTeachersByName(input));
         });
 
