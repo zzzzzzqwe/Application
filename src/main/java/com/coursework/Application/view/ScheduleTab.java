@@ -45,13 +45,13 @@ public class ScheduleTab {
         dayField.setPrefWidth(250);
         dayField.getStyleClass().add("text-field");
 
-        Label startLabel = new Label("Начало (HH:MM):");
+        Label startLabel = new Label("Начало:");
         TextField startField = new TextField();
         startField.setPromptText("09:00");
         startField.setPrefWidth(250);
         startField.getStyleClass().add("text-field");
 
-        Label endLabel = new Label("Конец (HH:MM):");
+        Label endLabel = new Label("Конец:");
         TextField endField = new TextField();
         endField.setPromptText("10:00");
         endField.setPrefWidth(250);
@@ -109,7 +109,7 @@ public class ScheduleTab {
         dayDelField.setPrefWidth(250);
         dayDelField.getStyleClass().add("text-field");
 
-        Label startDelLabel = new Label("Начало (HH:MM):");
+        Label startDelLabel = new Label("Начало:");
         TextField startDelField = new TextField();
         startDelField.setPromptText("09:00");
         startDelField.setPrefWidth(250);
