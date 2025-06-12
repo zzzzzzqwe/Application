@@ -86,19 +86,20 @@ public class ScheduleService {
         if (nameParts.length < 2) {
             return "Ошибка: неверный формат имени преподавателя.";
         }
-        String firstName = nameParts[0];
-        String lastName  = nameParts[1];
+        // String firstName = nameParts[0];
+        // String lastName  = nameParts[1];
 
         int teacherId;
         String findTeacherSql = """
                     SELECT id 
                     FROM teachers 
-                    WHERE last_name = ? AND first_name = ?;
+                    WHERE LOWER(CONCAT(last_name, ' ', first_name)) LIKE LOWER(?)
                 """;
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement psFind = con.prepareStatement(findTeacherSql)) {
-            psFind.setString(1, lastName);
-            psFind.setString(2, firstName);
+            psFind.setString(1, "%" + teacherName.trim() + "%");
+            // psFind.setString(1, lastName);
+            // psFind.setString(2, firstName);
             try (ResultSet rs = psFind.executeQuery()) {
                 if (rs.next()) {
                     teacherId = rs.getInt("id");

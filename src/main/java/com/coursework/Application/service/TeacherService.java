@@ -51,7 +51,7 @@ public class TeacherService {
             while (rs.next()) {
                 String lastName  = rs.getString("last_name");
                 String firstName = rs.getString("first_name");
-                list.add(firstName + " " + lastName);
+                list.add(lastName + " " + firstName);
             }
         } catch (SQLException e) {
             // empty list if something goes wrong
@@ -81,8 +81,8 @@ public class TeacherService {
 
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, "%" + first + "%");
-            ps.setString(2, "%" + last  + "%");
+            ps.setString(2, "%" + first + "%");
+            ps.setString(1, "%" + last  + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 StringBuilder result = new StringBuilder();
                 boolean found = false;

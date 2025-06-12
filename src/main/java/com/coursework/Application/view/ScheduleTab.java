@@ -85,7 +85,6 @@ public class ScheduleTab {
             roomCombo.setDisable(true);
             addLessonBtn.setDisable(true);
         }
-
         addForm.add(dayLabel,     0, 0);
         addForm.add(dayField,     1, 0);
         addForm.add(startLabel,   0, 1);
