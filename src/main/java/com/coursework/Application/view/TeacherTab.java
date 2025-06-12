@@ -101,11 +101,42 @@ public class TeacherTab {
         addForm.add(roomCombo,      1, 4);
         addForm.add(addTeacherBtn,  1, 5);
 
+
+        Separator separatorDel = new Separator();
+
+        Label headerDelete = new Label("Удалить преподавателя:");
+        GridPane deleteForm = new GridPane();
+        deleteForm.setHgap(10);
+        deleteForm.setVgap(10);
+
+        Label teacherDelLabel = new Label("Преподаватель:");
+        ComboBox<String> teacherDelCombo = new ComboBox<>();
+        teacherDelCombo.setPrefWidth(250);
+        teacherDelCombo.getStyleClass().add("combo-field");
+        teacherDelCombo.getItems().add("Выберите преподавателя");
+        teacherDelCombo.getItems().addAll(TeacherService.getAllTeacherDisplay());
+        teacherDelCombo.getSelectionModel().selectFirst();
+
+        Button deleteTeacherBtn = new Button("Удалить");
+        deleteTeacherBtn.getStyleClass().add("action-button");
+
+        if (!"admin".equals(UserSession.getUsername())) {
+            teacherDelCombo.setDisable(true);
+            deleteTeacherBtn.setDisable(true);
+        }
+
+        deleteForm.add(teacherDelLabel,    0, 0);
+        deleteForm.add(teacherDelCombo,    1, 0);
+        deleteForm.add(deleteTeacherBtn,   1, 1);
+
         container.getChildren().addAll(
                 allTeachersBtn,
                 separator,
                 headerAdd,
-                addForm
+                addForm,
+                separatorDel,
+                headerDelete,
+                deleteForm
         );
 
         ScrollPane scrollPane = new ScrollPane(container);
@@ -139,6 +170,15 @@ public class TeacherTab {
                 return;
             }
             outputArea.setText(TeacherService.addTeacher(first, last, email, phone, roomNumber));
+        });
+
+        deleteTeacherBtn.setOnAction(e -> {
+            String sel = teacherDelCombo.getValue();
+            if (sel == null || sel.equals("Выберите преподавателя")) {
+                outputArea.setText("Ошибка: выберите преподавателя.");
+            } else {
+                outputArea.setText(TeacherService.deleteTeacher(sel));
+            }
         });
 
         return tab;

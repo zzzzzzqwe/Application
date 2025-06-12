@@ -14,22 +14,22 @@ public class TeacherService {
     public static String getAllTeachers() {
         StringBuilder result = new StringBuilder();
         String sql = """
-            SELECT 
-                CONCAT(t.last_name, ' ', t.first_name) AS teacher,
-                t.email,
-                t.phone,
-                COALESCE(t.room_number, '-') AS room_number
-            FROM teachers t
-            ORDER BY t.last_name, t.first_name;
-        """;
+                    SELECT 
+                        CONCAT(t.last_name, ' ', t.first_name) AS teacher,
+                        t.email,
+                        t.phone,
+                        COALESCE(t.room_number, '-') AS room_number
+                    FROM teachers t
+                    ORDER BY t.last_name, t.first_name;
+                """;
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String teacher = rs.getString("teacher");
-                String email   = rs.getString("email");
-                String phone   = rs.getString("phone");
-                String room    = rs.getString("room_number");
+                String email = rs.getString("email");
+                String phone = rs.getString("phone");
+                String room = rs.getString("room_number");
                 result.append(teacher)
                         .append(" | ").append(email)
                         .append(" | ").append(phone)
@@ -49,7 +49,7 @@ public class TeacherService {
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                String lastName  = rs.getString("last_name");
+                String lastName = rs.getString("last_name");
                 String firstName = rs.getString("first_name");
                 list.add(lastName + " " + firstName);
             }
@@ -66,23 +66,23 @@ public class TeacherService {
 
         String[] parts = fullName.trim().split("\\s+", 2);
         String first = parts[0];
-        String last  = parts.length > 1 ? parts[1] : "";
+        String last = parts.length > 1 ? parts[1] : "";
 
         String sql = """
-        SELECT 
-            CONCAT(t.last_name, ' ', t.first_name) AS teacher,
-            t.email, t.phone,
-            COALESCE(t.room_number,'-') AS room
-        FROM teachers t
-        WHERE LOWER(t.first_name) LIKE LOWER(?)
-          AND LOWER(t.last_name)  LIKE LOWER(?)
-        ORDER BY t.last_name, t.first_name;
-    """;
+                    SELECT 
+                        CONCAT(t.last_name, ' ', t.first_name) AS teacher,
+                        t.email, t.phone,
+                        COALESCE(t.room_number,'-') AS room
+                    FROM teachers t
+                    WHERE LOWER(t.first_name) LIKE LOWER(?)
+                      AND LOWER(t.last_name)  LIKE LOWER(?)
+                    ORDER BY t.last_name, t.first_name;
+                """;
 
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(2, "%" + first + "%");
-            ps.setString(1, "%" + last  + "%");
+            ps.setString(1, "%" + last + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 StringBuilder result = new StringBuilder();
                 boolean found = false;
@@ -133,6 +133,41 @@ public class TeacherService {
             return "Преподаватель успешно добавлен.";
         } catch (SQLException e) {
             return "Ошибка при добавлении преподавателя: " + e.getMessage();
+        }
+    }
+
+    public static String deleteTeacher(String fullName) {
+        if (fullName == null || fullName.isBlank() || !fullName.contains(" ")) {
+            return "Ошибка: выберите преподавателя из списка.";
+        }
+        String[] parts = fullName.trim().split("\\s+", 2);
+        String firstName = parts[0];
+        String lastName = parts[1];
+
+        String sql = """
+                    DELETE FROM teachers
+                     WHERE Last_name = ? 
+                       AND first_name  = ?
+                """;
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                return "Преподаватель успешно удалён.";
+            } else {
+                return "Преподаватель не найден.";
+            }
+
+        } catch (SQLException e) {
+            // foreign key error
+            if ("23503".equals(e.getSQLState())) {
+                return "Невозможно удалить преподавателя: у него есть пара в расписании. Сначала удалите пару.";
+            }
+            return "Ошибка при удалении преподавателя: " + e.getMessage();
         }
     }
 }
