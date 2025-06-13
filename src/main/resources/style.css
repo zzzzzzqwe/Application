@@ -11,7 +11,7 @@
 .root-pane, .root-pane * {
     -fx-font-family: "Segoe UI", "Roboto", sans-serif;
     -fx-font-size: 13px;
-    -fx-text-fill: #2f3e4e; /* тёмно-серо-синий цвет текста */
+    -fx-text-fill: #2f3e4e;
 }
 
 .tab-pane {
@@ -20,15 +20,15 @@
 
 .tab-pane .tab-content-area {
     -fx-background-color: white;
-    -fx-background-radius: 8 8 0 0; /* скруглённые углы сверху */
+    -fx-background-radius: 8 8 0 0;
     -fx-border-color: #bfc7cf;
     -fx-border-width: 1;
-    -fx-padding: 16; /* внутренний отступ внутри контента */
+    -fx-padding: 16;
 }
 
 .tab-pane .tab-header-area {
     -fx-background-color: transparent;
-    -fx-padding: 8 0 0 16; /* отступ слева, сверху для табов */
+    -fx-padding: 8 0 0 16;
 }
 
 

@@ -6,7 +6,6 @@ import com.coursework.Application.view.TeacherTab;
 import com.coursework.Application.view.SearchTab;
 import com.coursework.Application.view.ScheduleTab;
 import com.coursework.Application.view.LoginWindow;
-import com.coursework.Application.service.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -16,7 +15,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -60,14 +58,6 @@ public class ApplicationDriver extends Application {
         outputArea.setWrapText(true);
         outputArea.setPrefRowCount(10);
         outputArea.getStyleClass().add("status-bar");
-
-       //  a bit buggy for now, weird scroll up
-//        double scrollMultiplier = 0.9;
-//        outputArea.addEventFilter(ScrollEvent.SCROLL, event -> {
-//            double delta = event.getDeltaY() * scrollMultiplier;
-//            outputArea.setScrollTop(outputArea.getScrollTop() - delta);
-//            event.consume();
-//        });
 
         rebuildTabs(tabPane);
 

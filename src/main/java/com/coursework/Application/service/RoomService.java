@@ -21,7 +21,7 @@ public class RoomService {
                 list.add(rs.getString("room_number"));
             }
         } catch (SQLException e) {
-            // empty list if something goes wrong
+            // empty list
         }
         return list;
     }
@@ -157,7 +157,7 @@ public class RoomService {
                 return "Аудитория не найдена.";
             }
         } catch (SQLException e) {
-            // 23503 - ограничение внешнего ключа (аудитория используется в расписании)
+            // 23503 - foreign key exception (room is used in schedule)
             if ("23503".equals(e.getSQLState())) {
                 return "Нельзя удалить аудиторию: она используется в расписании.";
             }
