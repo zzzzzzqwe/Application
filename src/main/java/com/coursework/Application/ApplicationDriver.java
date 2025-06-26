@@ -32,7 +32,7 @@ public class ApplicationDriver extends Application {
     @Override
     public void start(Stage primaryStage) {
         // automatic admin for testing, remove later todo
-        UserSession.login("admin");
+        // UserSession.login("admin");
 
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icon.png")));
